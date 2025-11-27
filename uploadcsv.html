@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <title>Upload CSV - SentimentAI</title>
+  <style>
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateX(-20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    .fade-in {
+      animation: fadeIn 0.6s ease-out;
+    }
+
+    .slide-in {
+      animation: slideIn 0.5s ease-out;
+    }
+
+    .gradient-border {
+      position: relative;
+      background: linear-gradient(white, white) padding-box,
+        linear-gradient(135deg, #10b981 0%, #059669 100%) border-box;
+      border: 3px solid transparent;
+    }
+
+    .hover-lift {
+      transition: all 0.3s ease;
+    }
+
+    .hover-lift:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    }
+
+    .file-upload-area {
+      border: 2px dashed #d1d5db;
+      transition: all 0.3s ease;
+    }
+
+    .file-upload-area:hover {
+      border-color: #10b981;
+      background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+    }
+
+    .file-upload-area.dragging {
+      border-color: #10b981;
+      background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+    }
+  </style>
+</head>
+
+<body class="bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 min-h-screen">
+  <!-- Header Navigation -->
+  <nav class="bg-white shadow-md sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-6 py-4">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center space-x-4">
+          <a href="index.html"
+            class="flex items-center space-x-2 text-white bg-green-600 px-4 py-2 rounded-2xl hover:bg-green-700 transition">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            <span class="font-semibold">Kembali</span>
+          </a>
+        </div>
+
+        <div class="flex items-center space-x-2">
+          <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+          </svg>
+          <span class="text-xl font-bold text-gray-800">Upload CSV Dataset</span>
+        </div>
+
+        <div class="w-20"></div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="max-w-6xl mx-auto px-6 py-12">
+    <!-- Page Header -->
+    <div class="text-center mb-12 fade-in">
+      <div
+        class="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full mb-4 shadow-lg">
+        <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+      </div>
+      <h1 class="text-4xl font-bold text-gray-800 mb-3">Analisis Dataset CSV</h1>
+      <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+        Upload file CSV berisi ribuan review dan analisis sentimen secara otomatis dengan Machine Learning
+      </p>
+    </div>
+
+    <!-- Info Cards -->
+    <div class="grid md:grid-cols-3 gap-6 mb-8">
+      <div class="bg-white rounded-xl p-6 shadow-md hover-lift">
+        <div class="flex items-center space-x-3">
+          <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+            <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
+            </svg>
+          </div>
+          <div>
+            <p class="text-sm text-gray-600">Format</p>
+            <p class="text-xl font-bold text-gray-800">CSV File</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl p-6 shadow-md hover-lift">
+        <div class="flex items-center space-x-3">
+          <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4" />
+            </svg>
+          </div>
+          <div>
+            <p class="text-sm text-gray-600">Kapasitas</p>
+            <p class="text-xl font-bold text-gray-800">Unlimited</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl p-6 shadow-md hover-lift">
+        <div class="flex items-center space-x-3">
+          <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+            <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+            </svg>
+          </div>
+          <div>
+            <p class="text-sm text-gray-600">Keamanan</p>
+            <p class="text-xl font-bold text-gray-800">Terjamin</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Upload Card -->
+    <div class="gradient-border rounded-2xl shadow-2xl mb-8 fade-in">
+      <div class="bg-white p-10 rounded-2xl">
+        <!-- File Upload Section -->
+        <div class="mb-8">
+          <label class="text-lg font-semibold text-gray-800 flex items-center space-x-2 mb-4">
+            <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+            </svg>
+            <span>Upload File CSV</span>
+          </label>
+
+          <!-- Drag & Drop Area -->
+          <div class="file-upload-area rounded-xl p-12 text-center bg-gray-50">
+            <div class="mb-4">
+              <svg class="w-16 h-16 mx-auto text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+              </svg>
+            </div>
+            <p class="text-gray-700 font-semibold mb-2">Drag & Drop file CSV Anda di sini</p>
+            <p class="text-gray-500 text-sm mb-4">atau</p>
+
+            <label for="csvInput" class="inline-block cursor-pointer">
+              <div
+                class="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white px-6 py-3 rounded-lg font-semibold shadow-lg transition-all transform hover:scale-105">
+                <span class="flex items-center space-x-2">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                  </svg>
+                  <span>Pilih File</span>
+                </span>
+              </div>
+            </label>
+
+            <input type="file" id="csvInput" accept=".csv" class="hidden" />
+
+            <p class="text-xs text-gray-500 mt-4">Format yang didukung: .csv (max 50MB)</p>
+          </div>
+
+          <!-- Selected File Info -->
+          <div id="fileInfo" class="hidden mt-4 p-4 bg-green-50 rounded-lg border border-green-200">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-3">
+                <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <div>
+                  <p id="fileName" class="font-semibold text-gray-800"></p>
+                  <p id="fileSize" class="text-sm text-gray-600"></p>
+                </div>
+              </div>
+              <button onclick="removeFile()" class="text-red-500 hover:text-red-700 transition">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Format Instructions -->
+          <div class="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-100">
+            <p class="text-sm font-semibold text-blue-800 mb-2 flex items-center">
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              Format CSV:
+            </p>
+            <p class="text-sm text-blue-700">File CSV harus memiliki kolom yang berisi teks review. Contoh: "Review",
+              "Text", "Komentar", dll.</p>
+          </div>
+        </div>
+
+        <!-- Upload Button -->
+        <button onclick="uploadCSV()"
+          class="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white py-5 rounded-xl font-bold text-lg shadow-xl hover:shadow-2xl transition-all transform hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center space-x-3">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+          </svg>
+          <span>Mulai Analisis Dataset</span>
+        </button>
+
+        <!-- Loading State -->
+        <div id="loadingCSV" class="hidden mt-8">
+          <div class="flex flex-col items-center justify-center py-12">
+            <div class="relative">
+              <div class="animate-spin h-16 w-16 border-4 border-gray-200 border-t-green-600 rounded-full"></div>
+              <div class="absolute inset-0 flex items-center justify-center">
+                <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+            </div>
+            <p class="mt-4 text-green-600 font-semibold text-lg">Memproses dataset CSV...</p>
+            <p class="text-gray-500 text-sm mt-1">Ini mungkin memakan waktu beberapa saat</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Results Section -->
+    <div id="csvResult" class="hidden space-y-8 slide-in">
+      <!-- Summary Cards -->
+      <div class="grid md:grid-cols-3 gap-6">
+        <div class="bg-white rounded-xl p-6 shadow-lg border-l-4 border-green-500">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm text-gray-600 mb-1">Total Review</p>
+              <p id="totalCount" class="text-3xl font-bold text-gray-800">0</p>
+            </div>
+            <div class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
+              <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-xl p-6 shadow-lg border-l-4 border-green-500">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm text-green-700 mb-1">Sentimen Positif</p>
+              <p id="positifCount" class="text-3xl font-bold text-green-600">0</p>
+            </div>
+            <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+              <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-xl p-6 shadow-lg border-l-4 border-red-500">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm text-red-700 mb-1">Sentimen Negatif</p>
+              <p id="negatifCount" class="text-3xl font-bold text-red-600">0</p>
+            </div>
+            <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+              <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-xl p-6 shadow-lg border-l-4 border-amber-500">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm text-amber-700 mb-1">Sentimen Netral</p>
+              <p id="netralCount" class="text-3xl font-bold text-amber-600">0</p>
+            </div>
+            <div class="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 16 16">
+                <path fill="#FFC107" fill-rule="evenodd"
+                  d="M8 13.5a5.5 5.5 0 1 0 0-11a5.5 5.5 0 0 0 0 11M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14M4.75 9.25a.75.75 0 0 1 .75-.75h5a.75.75 0 0 1 .75.75c0 .686-.43 1.319-.974 1.746c-.57.447-1.358.754-2.276.754s-1.706-.307-2.276-.754c-.543-.427-.974-1.06-.974-1.746M10 7.5a.75.75 0 0 1-.75-.75v-1a.75.75 0 0 1 1.5 0v1a.75.75 0 0 1-.75.75m-4.75-.75a.75.75 0 0 0 1.5 0v-1a.75.75 0 0 0-1.5 0z"
+                  clip-rule="evenodd" />
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Data Table -->
+      <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+        <div class="p-6 border-b border-gray-200 bg-gradient-to-r from-green-50 to-emerald-50">
+          <h3 class="text-2xl font-bold text-gray-800 flex items-center">
+            <svg class="w-7 h-7 text-green-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+            </svg>
+            Hasil Analisis Dataset
+          </h3>
+        </div>
+
+        <div class="overflow-x-auto m-5 rounded-2xl shadow-xl">
+          <table class="w-full rounded-2xl shadow-xl">
+            <thead class="bg-green-100 border-b-2 border-gray-200">
+              <tr class="bg-green-700">
+                <th class="p-4 text-left font-semibold text-white">Review</th>
+                <th class="p-4 text-left font-semibold text-white w-40">Sentimen</th>
+              </tr>
+            </thead>
+            <tbody id="csvTableBody" class="divide-y divide-green-200">
+              <!-- Data will be inserted here by chart.js -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination -->
+        <div class="p-6 bg-gray-50 border-t border-gray-200">
+          <div id="pagination" class="flex justify-center items-center space-x-2">
+            <!-- Pagination buttons will be inserted here by chart.js -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Chart Section -->
+      <div class="bg-white rounded-2xl shadow-xl p-8">
+        <h3 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+          <svg class="w-7 h-7 text-green-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+          </svg>
+          Visualisasi Distribusi Sentimen
+        </h3>
+        <div class="relative" style="height: 400px;">
+          <canvas id="sentimentChartCSV"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tips Section -->
+    <div class="mt-8 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-200">
+      <h4 class="font-semibold text-gray-800 mb-3 flex items-center">
+        <svg class="w-5 h-5 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+        </svg>
+        Tips Upload CSV:
+      </h4>
+      <ul class="space-y-2 text-sm text-gray-700">
+        <li class="flex items-start">
+          <span class="text-blue-600 mr-2">•</span>
+          <span>Pastikan file CSV memiliki kolom header yang jelas</span>
+        </li>
+        <li class="flex items-start">
+          <span class="text-blue-600 mr-2">•</span>
+          <span>Gunakan encoding UTF-8 untuk karakter Indonesia</span>
+        </li>
+        <li class="flex items-start">
+          <span class="text-blue-600 mr-2">•</span>
+          <span>Maksimal ukuran file adalah 50MB</span>
+        </li>
+        <li class="flex items-start">
+          <span class="text-blue-600 mr-2">•</span>
+          <span>Hasil analisis dapat didownload dalam format CSV</span>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <script>
+    // File input handler
+    const csvInput = document.getElementById('csvInput');
+    const fileInfo = document.getElementById('fileInfo');
+    const fileName = document.getElementById('fileName');
+    const fileSize = document.getElementById('fileSize');
+    const uploadArea = document.querySelector('.file-upload-area');
+
+    if (csvInput) {
+      csvInput.addEventListener('change', function (e) {
+        const file = e.target.files[0];
+        if (file) {
+          showFileInfo(file);
+        }
+      });
+
+      // Drag and drop handlers
+      uploadArea.addEventListener('dragover', function (e) {
+        e.preventDefault();
+        uploadArea.classList.add('dragging');
+      });
+
+      uploadArea.addEventListener('dragleave', function (e) {
+        e.preventDefault();
+        uploadArea.classList.remove('dragging');
+      });
+
+      uploadArea.addEventListener('drop', function (e) {
+        e.preventDefault();
+        uploadArea.classList.remove('dragging');
+
+        const file = e.dataTransfer.files[0];
+        if (file && file.name.endsWith('.csv')) {
+          csvInput.files = e.dataTransfer.files;
+          showFileInfo(file);
+        } else {
+          alert('⚠️ Mohon upload file dengan format .csv');
+        }
+      });
+    }
+
+    function showFileInfo(file) {
+      fileName.textContent = file.name;
+      fileSize.textContent = `${(file.size / 1024).toFixed(2)} KB`;
+      fileInfo.classList.remove('hidden');
+    }
+
+    function removeFile() {
+      csvInput.value = '';
+      fileInfo.classList.add('hidden');
+    }
+  </script>
+
+  <script src="chart.js"></script>
+</body>
+
+</html>
